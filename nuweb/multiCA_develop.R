@@ -1,7 +1,7 @@
 library(devtools)
 library(covr)
-source('c:/RForge/Nuweb.R')
-mc <- as.package("c:/RForge/multiCA")
+source('nuweb/Nuweb.R')
+mc <- as.package("c:/multiCA")
 
 use_git()
 use_github()
@@ -16,7 +16,7 @@ cov <- package_coverage(mc$path)
 shine(cov)
 
 
-check(mc, check_dir = "c:/RForge", check_version = TRUE, cran = TRUE, manual=TRUE)
+check(mc)
 install(mc)
 
 #create data set

@@ -476,19 +476,24 @@ cnonct <- function(x, p, df){
 #' Cochran-Armitage trend test or determine the sample size to obtain a target power. 
 #'
 #'@@details 
-#' The distribution of the outcomes can be specified in two ways: either the full matrix of 
-#' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters 
-#' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while 
+#' The distribution of the outcomes can be specified in two ways: 
+#'
+#' 1. the full matrix of outcome probabilities \code{pmatrix} can be specified, or 
+#'
+#' 2. exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} 
+#' can be specified. In this case the full matrix of outcome probabilites will be inferred
+#' assuming linearity within each outcome.
 #' 
 #' @@param N integer, the total sample size of the study. If \code{NULL} then \code{power} needs to be specified.
 #' @@param power target power. If \code{NULL} then \code{N} needs to be specified.
-#' @@param pmatrix numeric matrix of hypothesized outcome probabilities in each group,  with #' the outcomes as rows and ordered groups as columns. The columns should add up to 1. 
+#' @@param pmatrix numeric matrix of hypothesized outcome probabilities in each group,  with 
+#' the outcomes as rows and ordered groups as columns. The columns should add up to 1. 
 #' @@param p.ave numeric vector of average probability of each outcome over the groups  
 #' weighted by \code{n.prop}.
 #' @@param p.start,p.end numeric vectors of the probability of each outcome for the  
 #' first / last ordered group
 #' @@param slopes numeric vector of the hypothesized slope of each outcome when regressed  
-#' against the column \code{scores} wiht weights \code{n.prop}
+#' against the column \code{scores} with weights \code{n.prop}
 #' @@param scores non-decreasing numeric vector of the same length as the number of ordered groups  
 #' giving the trend test scores. Defaults to linearly increasing values.
 #' @@param n.prop numeric vector describing relative sample sizes of the ordered groups.  

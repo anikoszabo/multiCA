@@ -27,4 +27,3 @@ there is no solution and NA is returned.
 ## check
 pchisq(qchisq(0.95, df=10), df=10, ncp=ncp)  ## 0.8
 }
-
