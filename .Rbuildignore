@@ -1,0 +1,6 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+nuweb
+.Rnotyet
+TODO
+tags
