@@ -17,3 +17,5 @@ License: GPL (>=2)
 RoxygenNote: 5.0.1
 Suggests:
     testthat
+URL: https://github.com/anikoszabo/multiCA
+BugReports: https://github.com/anikoszabo/multiCA/issues
