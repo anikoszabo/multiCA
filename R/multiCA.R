@@ -452,3 +452,41 @@ power.multiCA.test <- function(N=NULL, power=NULL, pmatrix=NULL, p.ave=NULL, p.s
                      class = "power.htest")
    res
    }
+
+#' Power calculations for the Cochran-Armitage trend test
+#'
+
+power.CA.test <- function(N=NULL, power=NULL, pvec=NULL, scores=seq_along(pvec), 
+                          n.prop=rep(1, length(pvec)), sig.level=0.05){
+  if (sum(sapply(list(N, power), is.null)) != 1) 
+        stop("exactly one of 'N',  and 'power' must be NULL")
+  if (!is.numeric(sig.level) || any(0 > sig.level | sig.level > 1)) 
+        stop("'sig.level' must be numeric in [0, 1]")
+        
+  n.prop <- n.prop / sum(n.prop)
+  
+  
+  sbar <- sum(scores * n.prop)
+  pbar <- sum(pvec * n.prop)
+  v.nu <- sum(n.prop * (scores-sbar)^2)
+  v0 <- pbar * (1-pbar) * v.nu
+  v <- sum(n.prop * pvec * (1-pvec) * (scores-sbar)^2)
+  
+  crit <- qchisq(sig.level, df=1, lower.tail=FALSE)
+  ncp0 <-  sum(n.prop * pvec * (scores - sbar))^2 / v
+  
+  if (missing(power)){
+    ncp <- ncp0 * N
+    power <- pchisq(v0/v * crit, df=1, ncp=ncp, lower.tail=FALSE)
+   } 
+   else {
+     ncp <- cnonct(v0/v *crit, p=1-power, df=df)
+     N <-  ncp / ncp0
+   }
+
+   res <- structure(list(n = N, n.prop = n.prop, sig.level = sig.level, power = power,  
+                         method = "Cochran-Armitage trend test"), 
+                     class = "power.htest")
+   res
+   }
+        

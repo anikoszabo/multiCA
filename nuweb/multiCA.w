@@ -698,6 +698,71 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
   })
 @}
 
+
+\subsection{Power for Cochran-Armitage trend test}
+
+For $K=2$ the multinomial trend test reduces to the regular Cochran-Armitage trend test. For the power calculation, however, we do not need the approximation used for the multinomial test, and a better formula can be derived.
+
+Simplifying notations, let $p_i$, $i=1,\ldots,G$ denote the probability of an event in group $i$, and $x_i$ events out of $n_i$ trials are observed in this group. Then the unnormalized CA test statistic is $U = \sum_i x_i(c_i - \bar{c})$ with $\bar{c}=\sum_i \nu_i c_i$, $\nu_i = n_i/N$ and
+\begin{align*}
+U \mid H_0 &\sim N(0, N\sigma^2_0) \\
+U \mid H_a &\sim N(N\mu, N\sigma^2) 
+\end{align*}
+where $\mu = \sum_i \nu_i p_i(c_i - \bar{c})$ is the mean, $\sigma^2_0 = \bar{p}(1-\bar{p})\sum_i \nu_i(c_i - \bar{c})^2$ is the null variance, and $\sigma^2 = \sum_i \nu_ip_i(1-p_i)(c_i - \bar{c})^2$
+is the alternative variance.
+
+The traditional CA test statistic $T = U^2 \big/ (N\sigma_0^2) \sim \chi^2_1$ under $H_0$. Under $H_a$ we have 
+$$T = \frac{U^2}{N\sigma_0^2} =  \frac{\sigma^2}{\sigma_0^2}  \frac{U^2}{N\sigma^2} $$
+so $$\frac{\sigma_0^2}{\sigma^2} T = \frac{U^2}{N\sigma^2} \sim \chi^2_1\Big(N\frac{\mu^2}{\sigma^2}\Big),$$
+since $\frac{U}{\sqrt{N}\sigma} \sim N\Big( \frac{\sqrt{N}\mu}{\sigma}, 1\Big)$.
+
+The non-centrality parameter $$\lambda = N\frac{\mu^2}{\sigma^2} = \frac{\big[\sum{\nu_i p_i (c_i - \bar{c})\big]^2}}{\sum_i\nu_i p_i(1-p_i)(c_i-\bar{c})^2} =
+N \frac{\beta^2 s^2_{\nu}}{\bar{p}(1-\bar{p})} \frac{\sigma_0^2}{\sigma^2} = 
+\lambda_\text{approx} \frac{\sigma_0^2}{\sigma^2},$$
+
+where $\beta$ is the slope of regressing $p_i$ on $c_i$ with weights $\nu_i$ and $s^2_\nu = \sum_i \nu_i(c_i - \bar{c})^2$, as $\mu=\beta s^2_{\nu}$ and $\sigma_0^2 = \bar{p}(1-\bar{p})s^2_{\nu}$.
+
+
+@O ../R/multiCA.R @{
+#' Power calculations for the Cochran-Armitage trend test
+#'
+
+power.CA.test <- function(N=NULL, power=NULL, pvec=NULL, scores=seq_along(pvec), 
+                          n.prop=rep(1, length(pvec)), sig.level=0.05){
+  if (sum(sapply(list(N, power), is.null)) != 1) 
+        stop("exactly one of 'N',  and 'power' must be NULL")
+  if (!is.numeric(sig.level) || any(0 > sig.level | sig.level > 1)) 
+        stop("'sig.level' must be numeric in [0, 1]")
+        
+  n.prop <- n.prop / sum(n.prop)
+  
+  
+  sbar <- sum(scores * n.prop)
+  pbar <- sum(pvec * n.prop)
+  v.nu <- sum(n.prop * (scores-sbar)^2)
+  v0 <- pbar * (1-pbar) * v.nu
+  v <- sum(n.prop * pvec * (1-pvec) * (scores-sbar)^2)
+  
+  crit <- qchisq(sig.level, df=1, lower.tail=FALSE)
+  ncp0 <-  sum(n.prop * pvec * (scores - sbar))^2 / v
+  
+  if (missing(power)){
+    ncp <- ncp0 * N
+    power <- pchisq(v0/v * crit, df=1, ncp=ncp, lower.tail=FALSE)
+   } 
+   else {
+     ncp <- cnonct(v0/v *crit, p=1-power, df=df)
+     N <-  ncp / ncp0
+   }
+
+   res <- structure(list(n = N, n.prop = n.prop, sig.level = sig.level, power = power,  
+                         method = "Cochran-Armitage trend test"), 
+                     class = "power.htest")
+   res
+   }
+        
+@}        
+
 \section{Files}
 
 @f
