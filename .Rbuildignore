@@ -4,3 +4,4 @@ nuweb
 .Rnotyet
 TODO
 tags
+^cran-comments\.md$

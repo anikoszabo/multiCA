@@ -1,14 +1,12 @@
 Package: multiCA
 Type: Package
 Title: Multinomial Cochran-Armitage Trend Test
-Version: 1.2
-Date: 2017-08-07
-Author: Aniko Szabo
+Version: 1.2.0
+Date: 2025-03-25
 Depends:
     R(>= 2.10)
 Imports:
     bitops, multcomp
-Maintainer: Aniko Szabo <aszabo@mcw.edu>
 Description: Implements a generalization of the Cochran-Armitage trend test to
     multinomial data. In addition to an overall test, multiple testing adjusted
     p-values for trend in individual outcomes and power calculation is
@@ -20,3 +18,5 @@ Suggests:
     testthat
 URL: https://github.com/anikoszabo/multiCA
 BugReports: https://github.com/anikoszabo/multiCA/issues
+Authors@R: 
+    person("Aniko", "Szabo", , "aszabo@mcw.edu", role = c("aut", "cre"))

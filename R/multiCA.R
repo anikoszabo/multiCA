@@ -58,7 +58,7 @@
 
 #'@rdname multiCA.test
 #'@method multiCA.test default
-#'@param scores non-decreaseing numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
+#'@param scores non-decreasing numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
 #'@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
 #'@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.
 #'@export
@@ -134,7 +134,7 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
 
 #'@rdname multiCA.test
 #'@method multiCA.test formula
-#'@param formula a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variable over which the trend is tested.
+#'@param formula a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the categorical outcome and \code{group} is the grouping variable over which the trend is tested.
 #'@param data  an optional matrix or data frame containing the variables in the formula \code{formula}. By default the variables are taken from \code{environment(formula).}
 #'@param subset an optional vector specifying a subset of observations to be used.
 #'@param na.action      a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
@@ -263,7 +263,7 @@ cnonct <- function(x, p, df){
 #' 1. directly passing \code{p.ave} and  \code{slopes}, or 
 #'
 #' 2. specifying exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end}. 
-#' In this case the full matrix of outcome probabilites will be inferred
+#' In this case the full matrix of outcome probabilities will be inferred
 #' assuming linearity within each outcome.
 #'
 #' 3. specifying the full matrix of outcome probabilities \code{pmatrix}.  

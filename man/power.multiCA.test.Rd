@@ -62,7 +62,7 @@ The values of these two key inputs can be specified in three ways:
 1. directly passing \code{p.ave} and  \code{slopes}, or 
 
 2. specifying exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end}. 
-In this case the full matrix of outcome probabilites will be inferred
+In this case the full matrix of outcome probabilities will be inferred
 assuming linearity within each outcome.
 
 3. specifying the full matrix of outcome probabilities \code{pmatrix}.  
