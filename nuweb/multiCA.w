@@ -60,7 +60,7 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 #' \item{overall}{an object of class "htest" with the results of the overall test}
 #' \item{individual}{a vector with adjusted p-values for individual outcomes}
 #'@@author Aniko Szabo
-#'@@references Szabo, A. (2016) Test for trend with a multinomial outcome.  
+#'@@references Szabo, A. (2018). Test for Trend With a Multinomial Outcome. The American Statistician, 73(4), 313–320. 
 #'@@keywords nonparametric 
 #'@@examples
 #'
@@ -476,14 +476,25 @@ cnonct <- function(x, p, df){
 #' Cochran-Armitage trend test or determine the sample size to obtain a target power. 
 #'
 #'@@details 
-#' The distribution of the outcomes can be specified in two ways: 
+#' The sample size calculation depends only on \code{p.ave} - the weighted average probability of 
+#' each outcome, and \code{slopes} - the weighted regression slope of each outcome.
 #'
-#' 1. the full matrix of outcome probabilities \code{pmatrix} can be specified, or 
+#' The values of these two key inputs can be specified in three ways: 
 #'
-#' 2. exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} 
-#' can be specified. In this case the full matrix of outcome probabilites will be inferred
+#' 1. directly passing \code{p.ave} and  \code{slopes}, or 
+#'
+#' 2. specifying exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end}. 
+#' In this case the full matrix of outcome probabilites will be inferred
 #' assuming linearity within each outcome.
+#'
+#' 3. specifying the full matrix of outcome probabilities \code{pmatrix}.  
 #' 
+#' The calculation is based on approximating the distribution of the test statistic
+#' under the alternative with a non-central chi-squared distribution instead of the correct
+#' weighted mixture of multiple non-central chi-squares. This results in bias in the power
+#' away from 50% - values above it are somewhat overestimated, while values under it are
+#' underestimated.
+#'
 #' @@param N integer, the total sample size of the study. If \code{NULL} then \code{power} needs to be specified.
 #' @@param power target power. If \code{NULL} then \code{N} needs to be specified.
 #' @@param pmatrix numeric matrix of hypothesized outcome probabilities in each group,  with 
@@ -493,7 +504,8 @@ cnonct <- function(x, p, df){
 #' @@param p.start,p.end numeric vectors of the probability of each outcome for the  
 #' first / last ordered group
 #' @@param slopes numeric vector of the hypothesized slope of each outcome when regressed  
-#' against the column \code{scores} with weights \code{n.prop}
+#' against the column \code{scores} with weights \code{n.prop}. The values should add up to zero,
+#' as the total probability is always 1 and has no trend.
 #' @@param scores non-decreasing numeric vector of the same length as the number of ordered groups  
 #' giving the trend test scores. Defaults to linearly increasing values.
 #' @@param n.prop numeric vector describing relative sample sizes of the ordered groups.  
@@ -510,6 +522,9 @@ cnonct <- function(x, p, df){
 #' data(stroke)
 #' strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
 #' power.multiCA.test(N=900, pmatrix=prop.table(strk.mat, margin=2))
+#' @@seealso \code{\link{power.CA.test}} for simpler (and more precise) power calculation 
+#' with a binomial outcome 
+#' @@references Szabo, A. (2018). Test for Trend With a Multinomial Outcome. The American Statistician, 73(4), 313–320. 
 #' @@export
 #' @@importFrom stats pchisq qchisq weighted.mean
 
@@ -695,6 +710,168 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
                   "valid probability matrix")
     expect_error(power.multiCA.test(N=100, p.ave=c(0.4, 0.6), slopes=c(0.1, 0.1), G=3),
                 "slopes should sum to 0")
+  })
+@}
+
+
+\subsection{Power for Cochran-Armitage trend test}
+
+For $K=2$ the multinomial trend test reduces to the regular Cochran-Armitage trend test. For the power calculation, however, we do not need the approximation used for the multinomial test, and a better formula can be derived.
+
+Simplifying notations, let $p_i$, $i=1,\ldots,G$ denote the probability of an event in group $i$, and $x_i$ events out of $n_i$ trials are observed in this group. Then the unnormalized CA test statistic is $U = \sum_i x_i(c_i - \bar{c})$ with $\bar{c}=\sum_i \nu_i c_i$, $\nu_i = n_i/N$ and
+\begin{align*}
+U \mid H_0 &\sim N(0, N\sigma^2_0) \\
+U \mid H_a &\sim N(N\mu, N\sigma^2) 
+\end{align*}
+where $\mu = \sum_i \nu_i p_i(c_i - \bar{c})$ is the mean, $\sigma^2_0 = \bar{p}(1-\bar{p})\sum_i \nu_i(c_i - \bar{c})^2$ is the null variance, and $\sigma^2 = \sum_i \nu_ip_i(1-p_i)(c_i - \bar{c})^2$
+is the alternative variance.
+
+The traditional CA test statistic $T = U^2 \big/ (N\sigma_0^2) \sim \chi^2_1$ under $H_0$. Under $H_a$ we have 
+$$T = \frac{U^2}{N\sigma_0^2} =  \frac{\sigma^2}{\sigma_0^2}  \frac{U^2}{N\sigma^2} $$
+so $$\frac{\sigma_0^2}{\sigma^2} T = \frac{U^2}{N\sigma^2} \sim \chi^2_1\Big(N\frac{\mu^2}{\sigma^2}\Big),$$
+since $\frac{U}{\sqrt{N}\sigma} \sim N\Big( \frac{\sqrt{N}\mu}{\sigma}, 1\Big)$.
+
+The non-centrality parameter $$\lambda = N\frac{\mu^2}{\sigma^2} = \frac{\big[\sum{\nu_i p_i (c_i - \bar{c})\big]^2}}{\sum_i\nu_i p_i(1-p_i)(c_i-\bar{c})^2} =
+N \frac{\beta^2 s^2_{\nu}}{\bar{p}(1-\bar{p})} \frac{\sigma_0^2}{\sigma^2} = 
+\lambda_\text{approx} \frac{\sigma_0^2}{\sigma^2},$$
+
+where $\beta$ is the slope of regressing $p_i$ on $c_i$ with weights $\nu_i$ and $s^2_\nu = \sum_i \nu_i(c_i - \bar{c})^2$, as $\mu=\beta s^2_{\nu}$ and $\sigma_0^2 = \bar{p}(1-\bar{p})s^2_{\nu}$.
+
+In addition to the traditional test statistic, a $Z$-based version that allows directional testing is also implemented.
+This is based on the test statistic
+$$ Z = \frac{U}{\sqrt{N}\sigma_0}, $$
+which has a $N(0,1)$ distribution under $H_0$ and $N(\mu\sqrt{N}/\sigma_0, \sigma^2/\sigma_0^2)$ distribution under $H_a$.
+
+For one-sided testing, we have
+$$ \text{Power} = 1-\beta = P(Z > z_\alpha) = 1 - \Phi\Big(\frac{z_\alpha - \mu\sqrt{N} / \sigma_0}{\sigma / \sigma_0}
+=1 - \Phi\Big(\frac{ \sigma_0 z_\alpha - \mu\sqrt{N} }{\sigma}\Big)$$
+$$N = \Big[\frac{ \sigma_0 z_\alpha + \sigma z_{\beta}}{\mu}\Big]^2$$
+
+@O ../R/multiCA.R @{
+#' Power calculations for the Cochran-Armitage trend test
+#'
+#' @@param N integer, the total sample size of the study. If \code{NULL} then \code{power} needs to be specified.
+#' @@param power target power. If \code{NULL} then \code{N} needs to be specified.
+#' @@param pvec numeric vector of hypothesized outcome probabilities in each group. 
+#' @@param scores non-decreasing numeric vector of the same length as the number of ordered groups  
+#' giving the trend test scores. Defaults to linearly increasing values.
+#' @@param n.prop numeric vector describing relative sample sizes of the ordered groups.  
+#' Will be normalized to sum to 1. Defaults to equal sample sizes.
+#' @@param sig.level significance level
+#' @@param alternative character string specifying the alternative hypothesis
+#' @@return object of class "power.htest"
+#'
+#' @@examples
+#' # sample size required to detect with 80% power a decreasing trend over 4 groups 
+#' # with 3:2:1:2 sample-size distribution at a 2.5% significance level
+#' power.CA.test(power=0.8, pvec=c(0.4, 0.3, 0.2, 0.1), n.prop=c(3,2,1,2),
+#'               alternative = "less", sig.level=0.025)
+#'
+#' # power of a 2-sided test to detect a logistic increase with slope 0.2 over 5 groups
+#' # with groups of size 10 with unequal dose spacing
+#' doses <- c(0,1,2,4,8)
+#' p0 <- 0.05 # event probability at lowest dose
+#' logit.props <- log(p0/(1-p0)) + doses * 0.2
+#' p <- 1 / (1 + exp(-logit.props)) # hypothesized probabilities at each dose
+#' power.CA.test(N = 10 * 5, pvec=p, scores = doses)
+#'
+#' @@export
+#' @@references Nam, J. (1987). A Simple Approximation for Calculating Sample Sizes for Detecting Linear Trend in Proportions.
+#' Biometrics, 43(3), 701-705. 
+#' @@importFrom stats pnorm qnorm 
+#'
+
+power.CA.test <- function(N=NULL, power=NULL, pvec=NULL, scores=seq_along(pvec), 
+                          n.prop=rep(1, length(pvec)), sig.level=0.05,
+                          alternative = c("two.sided", "less", "greater")){
+  if (sum(sapply(list(N, power), is.null)) != 1) 
+        stop("exactly one of 'N',  and 'power' must be NULL")
+  if (!is.numeric(sig.level) || any(0 > sig.level | sig.level > 1)) 
+        stop("'sig.level' must be numeric in [0, 1]")
+  if (any(pvec < 0) | any(pvec > 1))
+        stop("All probabilities in 'pvec' should be between 0 and 1")
+  if (length(pvec) != length(scores) | length(pvec) != length(n.prop))
+      stop("Vectors 'pvec', 'scores', and 'n.prop', if specified, should have the same lengths.")
+  
+        
+  alternative <- match.arg(alternative)        
+        
+  n.prop <- n.prop / sum(n.prop)
+  
+  
+  sbar <- sum(scores * n.prop)
+  pbar <- sum(pvec * n.prop)
+  v.nu <- sum(n.prop * (scores-sbar)^2)
+  v0 <- pbar * (1-pbar) * v.nu
+  v <- sum(n.prop * pvec * (1-pvec) * (scores-sbar)^2)
+  mu <- sum(n.prop * pvec * (scores - sbar))
+  
+  if (alternative == "two.sided"){
+    crit <- qchisq(sig.level, df=1, lower.tail=FALSE)
+    ncp0 <- mu^2 / v
+  } else {
+    crit <- qnorm(sig.level, lower.tail=FALSE)
+    if (alternative == "less") crit <- (-1) * crit
+  }
+  
+  
+  if (missing(power)){
+    if (alternative == "two.sided"){
+      ncp <- ncp0 * N
+      power <- pchisq(v0/v * crit, df=1, ncp=ncp, lower.tail=FALSE)
+    } else {
+      term <- (sqrt(v0)*crit - mu * sqrt(N)) / sqrt(v)
+      power <- pnorm(term, lower.tail = (alternative == "less"))
+    }
+   } 
+   else {
+    if (alternative == "two.sided"){
+      ncp <- cnonct(v0/v *crit, p=1-power, df=1)
+      N <-  ncp / ncp0
+    } else {
+      zb <- qnorm(power, lower.tail=TRUE)
+      N <- (sqrt(v0) * crit + sqrt(v) * zb)^2 / mu^2
+    }
+   }
+
+   res <- structure(list(n = N, n.prop = n.prop, p = pvec, 
+                        alternative = alternative,  
+                        sig.level = sig.level, power = power,  
+                         method = "Cochran-Armitage trend test"), 
+                     class = "power.htest")
+   res
+   }
+        
+@}        
+
+@O ../tests/testthat/test_power.R @{
+  test_that("Binomial power calculation works", {
+    pvec0 <- seq(0.1, 0.2, length.out = 5)
+    res0 <- power.CA.test(N=100, pvec = pvec0)
+    expect_equal(100, power.CA.test(power=res0$power, pvec = pvec0)$n)
+    res_lo <- power.CA.test(N=100, pvec = pvec0, alternative = "less", 
+          sig.level = res0$sig.level/2)
+    res_up <- power.CA.test(N=100, pvec = pvec0, alternative = "greater", 
+          sig.level = res0$sig.level/2)
+    expect_equal(res0$power, res_lo$power + res_up$power)      
+    expect_equal(0.1, power.CA.test(N=100, pvec = rep(0.2, 4), sig.level=0.1)$power)
+    })
+@}
+
+@O ../tests/testthat/test_power.R @{
+  test_that("power.CA.test inputs are checked for validity", {
+    expect_error(power.CA.test(N=100, pvec = c(-0.5, 0.4)),
+                "should be between 0 and 1")
+    expect_error(power.CA.test(N=100, pvec = c(0.5, 1.4)),
+                "should be between 0 and 1")
+    expect_error(power.CA.test(N=100, pvec=c(0.1, 0.8), scores=1:3),
+                  "same lengths")
+    expect_error(power.CA.test(N=100, pvec=c(0.1, 0.8), scores=1:2, n.prop=1:3),
+                  "same lengths")
+    expect_error(power.CA.test(N=100, pvec = c(0.1, 0.2), power=0.8),
+                  "must be NULL")
+    expect_error(power.CA.test(pvec = c(0.1, 0.2)),
+                  "must be NULL")
   })
 @}
 

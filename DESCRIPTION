@@ -14,7 +14,8 @@ Description: Implements a generalization of the Cochran-Armitage trend test to
     p-values for trend in individual outcomes and power calculation is
     available.
 License: GPL (>=2)
-RoxygenNote: 7.1.1
+Encoding: UTF-8
+RoxygenNote: 7.2.3
 Suggests:
     testthat
 URL: https://github.com/anikoszabo/multiCA

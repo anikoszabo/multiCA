@@ -1,7 +1,7 @@
 library(devtools)
 library(covr)
 source('nuweb/Nuweb.R')
-mc <- as.package("c:/multiCA")
+mc <- as.package(".")
 
 use_git()
 use_github()
