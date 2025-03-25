@@ -1,5 +1,5 @@
-## R CMD check results
-
-0 errors | 0 warnings | 1 note
+## Submission March 25, 2025
 
 * This is a minor update with new functionality.
+
+* Checked on win-builder, mac-builder, Ubuntu/Gedora on rhub
