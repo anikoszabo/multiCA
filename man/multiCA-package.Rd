@@ -22,10 +22,8 @@ The main functionality is implemented in the \code{multiCA.test} function. The \
 Maintainer: \packageMaintainer{multiCA}
 }
 \references{
-Szabo, A. (2016) Test for trend with a multinomial outcome.
+Szabo, A. (2018). Test for Trend With a Multinomial Outcome. The American Statistician, 73(4), 313–320.
 }
 
-\keyword{ package
-htest
-nonparametric}
+
 

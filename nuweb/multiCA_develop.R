@@ -5,6 +5,8 @@ mc <- as.package(".")
 
 use_git()
 use_github()
+use_version("minor")
+use_author(given = "Aniko", family="Szabo", role = c("aut","cre"), email = "aszabo@mcw.edu")
 
 nuweb(mc)
 document(mc)
@@ -16,8 +18,31 @@ cov <- package_coverage(mc$path)
 shine(cov)
 
 
-check(mc)
+check(mc, cran = TRUE)
 install(mc)
+
+# releasing to CRAN
+
+release_checks(mc)
+spell_check()
+
+check_win_release()
+check_win_devel()
+check_mac_release()
+
+rhub::rhub_setup() # run once
+rhub::rhub_doctor()
+rhub::rhub_check()
+
+urlchecker::url_check()
+
+tools::dependsOnPkgs("multiCA")
+
+use_cran_comments()  #run first time
+
+# Final step:
+submit_cran()
+
 
 #create data set
 strk <- data.matrix(read.delim("z:/EOGeorge/MultiTrend/StrokeData.txt", row.names=1))
