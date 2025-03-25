@@ -18,7 +18,7 @@ cov <- package_coverage(mc$path)
 shine(cov)
 
 
-check(mc, cran = TRUE)
+check(mc, cran = TRUE, remote = TRUE)
 install(mc)
 
 # releasing to CRAN
@@ -42,7 +42,7 @@ tools::dependsOnPkgs("multiCA")
 use_cran_comments()  #run first time
 
 # Final step:
-submit_cran()
+release()
 
 
 #create data set
