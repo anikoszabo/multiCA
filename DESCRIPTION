@@ -1,7 +1,7 @@
 Package: multiCA
 Type: Package
 Title: Multinomial Cochran-Armitage Trend Test
-Version: 1.1
+Version: 1.2
 Date: 2017-08-07
 Author: Aniko Szabo
 Depends:
