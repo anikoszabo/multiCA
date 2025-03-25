@@ -5,3 +5,4 @@ nuweb
 TODO
 tags
 ^cran-comments\.md$
+^\.github
