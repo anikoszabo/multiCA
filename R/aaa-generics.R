@@ -12,7 +12,7 @@
 #' \item{overall}{an object of class "htest" with the results of the overall test}
 #' \item{individual}{a vector with adjusted p-values for individual outcomes}
 #'@author Aniko Szabo
-#'@references Szabo, A. (2016) Test for trend with a multinomial outcome.  
+#'@references Szabo, A. (2018). Test for Trend With a Multinomial Outcome. The American Statistician, 73(4), 313–320. 
 #'@keywords nonparametric 
 #'@examples
 #'

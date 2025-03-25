@@ -63,7 +63,7 @@ multiCA.test(strk.mat, outcomes=1:3)
 
 }
 \references{
-Szabo, A. (2016) Test for trend with a multinomial outcome.
+Szabo, A. (2018). Test for Trend With a Multinomial Outcome. The American Statistician, 73(4), 313–320.
 }
 \author{
 Aniko Szabo

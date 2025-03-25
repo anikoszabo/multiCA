@@ -33,7 +33,8 @@ weighted by \code{n.prop}.}
 first / last ordered group}
 
 \item{slopes}{numeric vector of the hypothesized slope of each outcome when regressed
-against the column \code{scores} with weights \code{n.prop}}
+against the column \code{scores} with weights \code{n.prop}. The values should add up to zero,
+as the total probability is always 1 and has no trend.}
 
 \item{scores}{non-decreasing numeric vector of the same length as the number of ordered groups
 giving the trend test scores. Defaults to linearly increasing values.}
@@ -53,13 +54,24 @@ Given the probabilities of outcomes, compute the power of the overall multinomia
 Cochran-Armitage trend test or determine the sample size to obtain a target power.
 }
 \details{
-The distribution of the outcomes can be specified in two ways: 
+The sample size calculation depends only on \code{p.ave} - the weighted average probability of 
+each outcome, and \code{slopes} - the weighted regression slope of each outcome.
 
-1. the full matrix of outcome probabilities \code{pmatrix} can be specified, or 
+The values of these two key inputs can be specified in three ways: 
 
-2. exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} 
-can be specified. In this case the full matrix of outcome probabilites will be inferred
+1. directly passing \code{p.ave} and  \code{slopes}, or 
+
+2. specifying exactly two of the parameters \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end}. 
+In this case the full matrix of outcome probabilites will be inferred
 assuming linearity within each outcome.
+
+3. specifying the full matrix of outcome probabilities \code{pmatrix}.  
+
+The calculation is based on approximating the distribution of the test statistic
+under the alternative with a non-central chi-squared distribution instead of the correct
+weighted mixture of multiple non-central chi-squares. This results in bias in the power
+away from 50% - values above it are somewhat overestimated, while values under it are
+underestimated.
 }
 \examples{
 power.multiCA.test(power=0.8, p.start=c(0.1,0.2,0.3,0.4), p.end=c(0.4, 0.3, 0.2, 0.1), 
@@ -69,4 +81,11 @@ power.multiCA.test(power=0.8, p.start=c(0.1,0.2,0.3,0.4), p.end=c(0.4, 0.3, 0.2,
 data(stroke)
 strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
 power.multiCA.test(N=900, pmatrix=prop.table(strk.mat, margin=2))
+}
+\references{
+Szabo, A. (2018). Test for Trend With a Multinomial Outcome. The American Statistician, 73(4), 313–320.
+}
+\seealso{
+\code{\link{power.CA.test}} for simpler (and more precise) power calculation 
+with a binomial outcome
 }
