@@ -2,4 +2,4 @@
 
 * This is a minor update with new functionality.
 
-* Checked on win-builder, mac-builder, Ubuntu/Gedora on rhub
+* Checked on win-builder, mac-builder, Ubuntu/Fedora on rhub

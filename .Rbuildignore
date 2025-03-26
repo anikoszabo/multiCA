@@ -7,3 +7,4 @@ tags
 ^cran-comments\.md$
 ^\.github
 ^CRAN-SUBMISSION$
+^revdep

@@ -38,6 +38,8 @@ rhub::rhub_check()
 urlchecker::url_check()
 
 tools::dependsOnPkgs("multiCA")
+revdepcheck::cran_revdeps("multiCA")
+revdepcheck::revdep_check()
 
 use_cran_comments()  #run first time
 
